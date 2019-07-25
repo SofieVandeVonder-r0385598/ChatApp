@@ -10,12 +10,13 @@ import javax.servlet.http.HttpSession;
 import domain.Person;
 import domain.PersonService;
 
-public class LogIn extends RequestHandler {
+public class LogIn extends SyncRequestHandler {
 
 	@Override
 	public String handleRequest(HttpServletRequest request,
 			HttpServletResponse response) {
 		String destination = "index.jsp";
+
 		List<String> errors = new ArrayList<String>();
 		
 		String email = request.getParameter("email");
@@ -41,14 +42,19 @@ public class LogIn extends RequestHandler {
 		if (errors.size() > 0) {
 			request.setAttribute("errors", errors);
 		}
-		
-		return destination;	
+
+	/*String status = "Online";
+		request.setAttribute("status", status);
+		return destination;	*/
+
+	return destination;
 	}
 	
-	private void createSession(Person person, HttpServletRequest request,
+	private void createSession(Person person,HttpServletRequest request,
 			HttpServletResponse response) {
 		HttpSession session = request.getSession();
 		session.setAttribute("user", person);
+		//session.setAttribute("status", "ONLINE");
 	}
 
 }

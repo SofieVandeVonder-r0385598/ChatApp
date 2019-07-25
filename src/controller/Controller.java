@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import domain.PersonService;
+import sun.misc.Request;
 
 @WebServlet("/Controller")
 public class Controller extends HttpServlet {
@@ -37,22 +38,31 @@ public class Controller extends HttpServlet {
 	protected void processRequest(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-        String destination = "index.jsp";
+        String result = "index.jsp";
+		RequestHandler handler = null;
         if (action != null) {
-        	RequestHandler handler;
+
         	try {
         		handler = controllerFactory.getController(action, model);
-				destination = handler.handleRequest(request, response);
+				result = handler.handleRequest(request, response);
+
         	} 
         	catch (NotAuthorizedException exc) {
         		List<String> errors = new ArrayList<String>();
         		errors.add(exc.getMessage());
         		request.setAttribute("errors", errors);
-        		destination="index.jsp";
+        		result="index.jsp";
         	}
         }
-        RequestDispatcher view = request.getRequestDispatcher(destination);
-        view.forward(request, response);
+
+
+        if(handler instanceof  SyncRequestHandler) {
+			RequestDispatcher view = request.getRequestDispatcher(result);
+			view.forward(request, response);
+		}
+		else{
+			response.getWriter().write(result);
+		}
 	}
 
 }
